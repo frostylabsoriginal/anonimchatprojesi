@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Room</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="chat-container">
+    <div id="messages"></div>
+    <input id="messageInput" type="text" placeholder="Mesajınızı yazın..." autofocus>
+    <button id="sendButton">📤</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const messagesDiv = document.getElementById('messages');
+
+    const username = localStorage.getItem('username') || 'Anonim';
+    const profilePicture = localStorage.getItem('profilePicture') || 'https://via.placeholder.com/40';
+    const room = 'general'; // Sabit bir oda
+
+    socket.emit('join room', { username, room, profilePicture });
+
+    socket.on('chat message', (msg) => {
+      displayMessage(msg);
+    });
+
+    function displayMessage(msg) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.innerHTML = `
+        <img src="${msg.profilePicture}" class="avatar" alt="avatar">
+        <span class="username">${msg.username}:</span>
+        <span>${msg.text}</span>
+      `;
+      messagesDiv.appendChild(messageElement);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight; 
+    }
+
+    sendButton.addEventListener('click', () => {
+      sendMessage();
+    });
+
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (messageText.includes('<') || messageText.includes('>')) {
+        alert("Mesajda yasaklı karakterler var.");
+        location.reload();
+        return;
+      }
+      if (messageText) {
+        socket.emit('chat message', { username, text: messageText, room, profilePicture });
+        messageInput.value = '';
+      }
+    }
+
+    console.log('Merhaba dostum, hoşgeldin! Eğer bir kod yazacaksan bunu pek önermem. Çünkü herhangi bir komut gönderenlerin IP adreslerini ve adreslerini chate yollayacağım.');
+  </script>
+</body>
+</html>

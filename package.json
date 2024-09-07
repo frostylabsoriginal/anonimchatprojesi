@@ -1,0 +1,16 @@
+{
+  "name": "my-chat-app",
+  "version": "1.0.0",
+  "description": "Anonymous chat application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "express": "^4.17.3",
+    "express-rate-limit": "^5.5.1",
+    "node-fetch": "^2.7.0",
+    "socket.io": "^4.3.2"
+  }
+}
